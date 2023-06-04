@@ -1,0 +1,336 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+class human {
+public:
+    string name;
+    int age;
+};
+
+class course {
+public:
+    string cname;
+    int instructor, cid;
+    char attendance;
+};
+
+class faculty : public human {
+public:
+    faculty() {
+        mycoursecount = -1;
+    }
+    course mycourses[5];
+    int id;
+    int mycoursecount;
+};
+
+class student : public human {
+public:
+    int mycount;
+    student() {
+        mycount = -1;
+    }
+    course taken[4];
+    void enrollcourse();
+};
+
+class admin : public human {
+public:
+    student totals[10];
+    course totalcourse[10];
+    faculty ftotal[5];
+	void checkStudentsInCourse(int courseId) {
+    for (int i = 0; i <= studentcount; i++) {
+        for (int j = 0; j <= totals[i].mycount; j++) {
+            if (totals[i].taken[j].cid == courseId) {
+                cout << "Student ID: " << i << ", Name: " << totals[i].name << endl;
+                break;
+            }
+        }
+    }
+}
+    void addstudent() {
+        cout << "Enter Student Name: ";
+        cin.ignore();
+        getline(cin, totals[++studentcount].name);
+        cout << "ID#" << studentcount << " has been assigned to this student\n";
+    }
+
+    void addfaculty() {
+        cout << "Enter Faculty Name: ";
+        cin.ignore();
+        getline(cin, ftotal[++facultycount].name);
+        cout << "Enter Faculty ID: ";
+        cin >> ftotal[facultycount].id;
+    }
+
+    void startsem() {
+        int i;
+        cout << "Enter total courses you want to offer: ";
+        cin >> i;
+        for (int j = 0; j < i; j++) {
+            int tempid;
+            cout << "Enter Course Name: ";
+            cin.ignore();
+            getline(cin, totalcourse[++totalcoursecount].cname);
+            cout << "Enter Course ID: ";
+            cin >> totalcourse[totalcoursecount].cid;
+            cout << "Enter Course Instructor ID: ";
+            cin >> tempid;
+            for (int k = 0; k <= facultycount; k++) {
+                if (tempid == ftotal[k].id) {
+                    ftotal[k].mycourses[++ftotal[k].mycoursecount] = totalcourse[totalcoursecount];
+                    cout << "Course has been assigned to Mr/Ms. " << ftotal[k].name << endl;
+                }
+            }
+        }
+    }
+
+    static int studentcount;
+    static int facultycount;
+    static int totalcoursecount;
+};
+
+int admin::studentcount = -1;
+int admin::totalcoursecount = -1;
+int admin::facultycount = -1;
+admin no1;
+
+void student::enrollcourse() {
+    int tempcid;
+    cout << "\nFollowing Courses are available: \n";
+    for (int j = 0; j <= admin::totalcoursecount; j++) {
+        cout << no1.totalcourse[j].cname << " - " << no1.totalcourse[j].cid << endl;
+    }
+    cout << "Enter course id: ";
+    cin >> tempcid;
+    for (int i = 0; i <= admin::totalcoursecount; i++) {
+        if (tempcid == no1.totalcourse[i].cid) {
+            taken[++mycount] = no1.totalcourse[i];
+            cout << "Enrolled";
+        }
+        else
+            cout << "Not Enrolled (Error)";
+    }
+}
+
+void writeToFile(admin& obj) {
+    cout<<"Writing data for future use";
+    ofstream outFile;
+    outFile.open("data.txt", ios::out);
+    if (outFile) {
+        outFile << obj.studentcount << endl;
+        for (int i = 0; i <= obj.studentcount; i++) {
+            outFile << obj.totals[i].name << endl;
+            outFile << obj.totals[i].age << endl;
+            outFile << obj.totals[i].mycount << endl;
+            for (int j = 0; j <= obj.totals[i].mycount; j++) {
+                outFile << obj.totals[i].taken[j].cname << endl;
+                outFile << obj.totals[i].taken[j].instructor << endl;
+                outFile << obj.totals[i].taken[j].cid << endl;
+                outFile << obj.totals[i].taken[j].attendance << endl;
+            }
+        }
+        outFile << obj.totalcoursecount << endl;
+        for (int i = 0; i <= obj.totalcoursecount; i++) {
+            outFile << obj.totalcourse[i].cname << endl;
+            outFile << obj.totalcourse[i].instructor << endl;
+            outFile << obj.totalcourse[i].cid << endl;
+            outFile << obj.totalcourse[i].attendance << endl;
+        }
+        outFile << obj.facultycount << endl;
+        for (int i = 0; i <= obj.facultycount; i++) {
+            outFile << obj.ftotal[i].name << endl;
+            outFile << obj.ftotal[i].age << endl;
+            outFile << obj.ftotal[i].id << endl;
+            outFile << obj.ftotal[i].mycoursecount << endl;
+            for (int j = 0; j <= obj.ftotal[i].mycoursecount; j++) {
+                outFile << obj.ftotal[i].mycourses[j].cname << endl;
+                outFile << obj.ftotal[i].mycourses[j].instructor << endl;
+                outFile << obj.ftotal[i].mycourses[j].cid << endl;
+                outFile << obj.ftotal[i].mycourses[j].attendance << endl;
+            }
+        }
+        outFile.close();
+    }
+    else {
+        cout << "Unable to write to file." << endl;
+    }
+}
+
+void readFromFile(admin& obj) {
+    ifstream inFile;
+    inFile.open("data.txt", ios::in);
+    if (inFile) {
+        cout<<"Loadng Existing data";
+        inFile >> obj.studentcount;
+        inFile.ignore();
+        for (int i = 0; i <= obj.studentcount; i++) {
+            getline(inFile, obj.totals[i].name);
+            inFile >> obj.totals[i].age;
+            inFile >> obj.totals[i].mycount;
+            inFile.ignore();
+            for (int j = 0; j <= obj.totals[i].mycount; j++) {
+                getline(inFile, obj.totals[i].taken[j].cname);
+                inFile >> obj.totals[i].taken[j].instructor;
+                inFile >> obj.totals[i].taken[j].cid;
+                inFile >> obj.totals[i].taken[j].attendance;
+                inFile.ignore();
+            }
+        }
+        inFile >> obj.totalcoursecount;
+        inFile.ignore();
+        for (int i = 0; i <= obj.totalcoursecount; i++) {
+            getline(inFile, obj.totalcourse[i].cname);
+            inFile >> obj.totalcourse[i].instructor;
+            inFile >> obj.totalcourse[i].cid;
+            inFile >> obj.totalcourse[i].attendance;
+            inFile.ignore();
+        }
+        inFile >> obj.facultycount;
+        inFile.ignore();
+        for (int i = 0; i <= obj.facultycount; i++) {
+            getline(inFile, obj.ftotal[i].name);
+            inFile >> obj.ftotal[i].age;
+            inFile >> obj.ftotal[i].id;
+            inFile >> obj.ftotal[i].mycoursecount;
+            inFile.ignore();
+            for (int j = 0; j <= obj.ftotal[i].mycoursecount; j++) {
+                getline(inFile, obj.ftotal[i].mycourses[j].cname);
+                inFile >> obj.ftotal[i].mycourses[j].instructor;
+                inFile >> obj.ftotal[i].mycourses[j].cid;
+                inFile >> obj.ftotal[i].mycourses[j].attendance;
+                inFile.ignore();
+            }
+        }
+        inFile.close();
+    }
+    else {
+        cout << "No Existing data Found";
+    }
+}
+
+
+
+int main() {
+    int user;
+    readFromFile(no1);
+
+    while (1) {
+        cout << "\n-----------------------------Welcome to student portal----------------------------";
+        cout << "\n1.Admin\n2.Student\n3.Instructor\n4.Write Data and EXIT\nChoose a role(Press any other key to exit): ";
+        cin >> user;
+
+        if (user == 1) {
+        while (1) {
+        int choice;
+        cout << "\n\n---------ADMIN PANEL---------\n0. Add Faculty Member\n1. Add student\n2. Start Semester\n3. Check students in a course\n4. Exit\nChoose an option: ";
+        cin >> choice;
+        if (choice == 0) {
+            no1.addfaculty();
+        }
+        else if (choice == 1) {
+            no1.addstudent();
+        }
+        else if (choice == 2) {
+            no1.startsem();
+        }
+        else if (choice == 3) {
+            int tempcid;
+            cout << "Enter Course ID: ";
+            cin >> tempcid;
+            cout << "Students enrolled in course " << tempcid << ":" << endl;
+            no1.checkStudentsInCourse(tempcid);
+        }
+            else 
+            break;
+        }
+    }
+		else if (user == 2) {
+            int sid;
+            cout << "\nEnter Your ID: ";
+            cin >> sid;
+            while (1) {
+                int choice;
+                cout << "\n\n---------STUDENT PANEL---------\n\nWelcome - " << no1.totals[sid].name << "\n1. Enroll a course\n2. View attendance\n3. Exit\nChoose an option: ";
+                cin >> choice;
+                if (choice == 1) {
+                    no1.totals[sid].enrollcourse();
+                }
+                else if (choice == 2) {
+                    int tempsid, tempcid;
+                    tempsid=sid;
+                    cout << "\n Enter a course ID: ";
+                    cin >> tempcid;
+                    for (int i = 0; i <= admin::studentcount; i++) {
+                        if (sid == i) {
+                            for (int j = 0; j <= no1.totals[i].mycount; j++) {
+                                if (tempcid == no1.totals[i].taken[j].cid) {
+                                    cout << "Your Attendance: ";
+                                    cout << no1.totals[i].taken[j].attendance;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                    break;
+            }
+        }
+        else if (user == 3) {
+            int choice;
+            cout << "\n\n---------FACULTY PANEL---------\n1. View Courses\n2. Upload Attendance\n3. Exit\nChoose an option: ";
+            cin >> choice;
+            if (choice == 1) {
+                int tempfid;
+                cout << "Enter Your ID: ";
+                cin >> tempfid;
+                cout << "Your Courses are: ";
+                for (int k = 0; k <= admin::facultycount; k++) {
+                    if (tempfid == no1.ftotal[k].id) {
+                        for (int i = 0; i <= no1.ftotal[k].mycoursecount; i++)
+                            cout << no1.ftotal[k].mycourses[i].cname << " - " << no1.ftotal[k].mycourses[i].cid << endl;
+                    }
+                }
+            }
+            else if (choice == 2) {
+                int tempfid;
+                cout << "Enter Your ID: ";
+                cin >> tempfid;
+                cout << "Your Courses are: ";
+                for (int k = 0; k <= admin::facultycount; k++) {
+                    if (tempfid == no1.ftotal[k].id) {
+                        for (int i = 0; i <= no1.ftotal[k].mycoursecount; i++)
+                            cout << no1.ftotal[k].mycourses[i].cname << " - " << no1.ftotal[k].mycourses[i].cid << endl;
+                        break;
+                    }
+                }
+                int tempcid, sid;
+                cout << "\nEnter a course ID to upload attendance: ";
+                cin >> tempcid;
+                 for (int i = 0; i <= admin::studentcount; i++) {
+                    {
+                        for (int j = 0; j <= no1.totals[i].mycount; j++) {
+                            if (tempcid == no1.totals[i].taken[j].cid) {
+                                cout << "Enter Attendance(P/A) for ID#"<<i;
+                                cin >> no1.totals[i].taken[j].attendance;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if (user==4) {
+            writeToFile(no1);
+            break;
+        }
+        else{
+            break;
+        }
+    }
+
+    return 0;
+}
