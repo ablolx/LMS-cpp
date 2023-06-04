@@ -3,20 +3,20 @@
 #include <string>
 
 using namespace std;
-
+//Basic human class
 class human {
 public:
     string name;
     int age;
 };
-
+//Courses class
 class course {
 public:
     string cname;
     int instructor, cid;
     char attendance;
 };
-
+//Faculty class inherited from human
 class faculty : public human {
 public:
     faculty() {
@@ -26,7 +26,7 @@ public:
     int id;
     int mycoursecount;
 };
-
+//Student class inherited from human
 class student : public human {
 public:
     int mycount;
@@ -36,7 +36,7 @@ public:
     course taken[4];
     void enrollcourse();
 };
-
+//Admin class inherited from human
 class admin : public human {
 public:
     student totals[10];
@@ -52,6 +52,7 @@ public:
         }
     }
 }
+//Class methods for admin
     void addstudent() {
         cout << "Enter Student Name: ";
         cin.ignore();
@@ -98,7 +99,7 @@ int admin::studentcount = -1;
 int admin::totalcoursecount = -1;
 int admin::facultycount = -1;
 admin no1;
-
+//Student's Class method
 void student::enrollcourse() {
     int tempcid;
     cout << "\nFollowing Courses are available: \n";
@@ -116,7 +117,7 @@ void student::enrollcourse() {
             cout << "Not Enrolled (Error)";
     }
 }
-
+//Function to write data into a file
 void writeToFile(admin& obj) {
     cout<<"Writing data for future use";
     ofstream outFile;
@@ -160,7 +161,7 @@ void writeToFile(admin& obj) {
         cout << "Unable to write to file." << endl;
     }
 }
-
+//Function to Read Data from file
 void readFromFile(admin& obj) {
     ifstream inFile;
     inFile.open("data.txt", ios::in);
@@ -214,12 +215,13 @@ void readFromFile(admin& obj) {
 }
 
 
-
+//Main starts here
 int main() {
     int user;
     readFromFile(no1);
 
     while (1) {
+     //Mainmenu
         cout << "\n-----------------------------Welcome to student portal----------------------------";
         cout << "\n1.Admin\n2.Student\n3.Instructor\n4.Write Data and EXIT\nChoose a role(Press any other key to exit): ";
         cin >> user;
@@ -227,6 +229,7 @@ int main() {
         if (user == 1) {
         while (1) {
         int choice;
+	//Admin Menu
         cout << "\n\n---------ADMIN PANEL---------\n0. Add Faculty Member\n1. Add student\n2. Start Semester\n3. Check students in a course\n4. Exit\nChoose an option: ";
         cin >> choice;
         if (choice == 0) {
@@ -255,6 +258,7 @@ int main() {
             cin >> sid;
             while (1) {
                 int choice;
+		//Student Menu
                 cout << "\n\n---------STUDENT PANEL---------\n\nWelcome - " << no1.totals[sid].name << "\n1. Enroll a course\n2. View attendance\n3. Exit\nChoose an option: ";
                 cin >> choice;
                 if (choice == 1) {
@@ -282,6 +286,7 @@ int main() {
         }
         else if (user == 3) {
             int choice;
+	    //Faculty Menu
             cout << "\n\n---------FACULTY PANEL---------\n1. View Courses\n2. Upload Attendance\n3. Exit\nChoose an option: ";
             cin >> choice;
             if (choice == 1) {
